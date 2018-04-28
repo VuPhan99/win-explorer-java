@@ -26,7 +26,7 @@ import java.awt.FlowLayout;
 
 public class FileExplorer {
 
-	public static final String APP_TITLE = "FileBro";
+	public static final String APP_TITLE = "Xuan_Vu";
 	private Desktop desktop;
 	private FileSystemView fileSystemView;
 	@SuppressWarnings("unused")
