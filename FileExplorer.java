@@ -54,6 +54,42 @@ public class FileExplorer {
 	private JTextField textField;
 	List<String> filesListInDir = new ArrayList<String>();
 
+	private void zipDirectory(File dir, String zipDirName) {
+		try {
+			populateFilesList(dir);
+			FileOutputStream fos = new FileOutputStream(zipDirName);
+			ZipOutputStream zos = new ZipOutputStream(fos);
+			for (String filePath : filesListInDir) {
+				System.out.println("Zipping " + filePath);
+				ZipEntry ze = new ZipEntry(filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
+				zos.putNextEntry(ze);
+				FileInputStream fis = new FileInputStream(filePath);
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = fis.read(buffer)) > 0) {
+					zos.write(buffer, 0, len);
+				}
+				zos.closeEntry();
+				fis.close();
+			}
+			zos.close();
+			fos.close();
+			System.out.println("Done");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void populateFilesList(File dir) throws IOException {
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			if (file.isFile())
+				filesListInDir.add(file.getAbsolutePath());
+			else
+				populateFilesList(file);
+		}
+	}
+
 	public Container getGui() {
 
 		if (gui == null) {
@@ -180,42 +216,6 @@ public class FileExplorer {
 
 		}
 		return gui;
-	}
-
-	private void zipDirectory(File dir, String zipDirName) {
-		try {
-			populateFilesList(dir);
-			FileOutputStream fos = new FileOutputStream(zipDirName);
-			ZipOutputStream zos = new ZipOutputStream(fos);
-			for (String filePath : filesListInDir) {
-				System.out.println("Zipping " + filePath);
-				ZipEntry ze = new ZipEntry(filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
-				zos.putNextEntry(ze);
-				FileInputStream fis = new FileInputStream(filePath);
-				byte[] buffer = new byte[1024];
-				int len;
-				while ((len = fis.read(buffer)) > 0) {
-					zos.write(buffer, 0, len);
-				}
-				zos.closeEntry();
-				fis.close();
-			}
-			zos.close();
-			fos.close();
-			System.out.println("Done");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void populateFilesList(File dir) throws IOException {
-		File[] files = dir.listFiles();
-		for (File file : files) {
-			if (file.isFile())
-				filesListInDir.add(file.getAbsolutePath());
-			else
-				populateFilesList(file);
-		}
 	}
 
 	public void showRootFile() {
