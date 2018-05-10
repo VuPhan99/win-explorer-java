@@ -22,12 +22,10 @@ import java.util.zip.ZipOutputStream;
 import java.util.ArrayList;
 import java.io.*;
 import java.net.URL;
-import java.awt.FlowLayout;
 
 public class FileExplorer {
 
 	public static final String APP_TITLE = "Xuan_Vu";
-	private Desktop desktop;
 	private FileSystemView fileSystemView;
 	@SuppressWarnings("unused")
 	private File currentFile;
@@ -39,15 +37,12 @@ public class FileExplorer {
 	private ListSelectionListener listSelectionListener;
 	private boolean cellSizesSet = false;
 	private int rowIconPadding = 6;
-	private JButton printFile;
-	private JTextField path;
 	@SuppressWarnings("unused")
 	private JPanel newFilePanel;
 	@SuppressWarnings("unused")
 	private JRadioButton newTypeFile;
 	@SuppressWarnings("unused")
 	private JTextField name;
-
 	FileOutputStream fos;
 	ZipOutputStream zipos;
 	FileInputStream fis;
@@ -55,7 +50,9 @@ public class FileExplorer {
 	File file;
 	ZipInputStream zis;
 	JFileChooser fc;
-	private JTextField tfSearch;
+	private JTextField path;
+	private JTextField textField;
+	List<String> filesListInDir = new ArrayList<String>();
 
 	public Container getGui() {
 
@@ -64,7 +61,7 @@ public class FileExplorer {
 			gui.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 			fileSystemView = FileSystemView.getFileSystemView();
-			desktop = Desktop.getDesktop();
+			Desktop.getDesktop();
 
 			JPanel detailView = new JPanel(new BorderLayout(3, 3));
 
@@ -90,21 +87,6 @@ public class FileExplorer {
 
 			JPanel fileDetailsLabels = new JPanel(new GridLayout(0, 1, 2, 2));
 			fileMainDetails.add(fileDetailsLabels, BorderLayout.WEST);
-
-			JPanel fileDetailsValues = new JPanel();
-			fileMainDetails.add(fileDetailsValues, BorderLayout.SOUTH);
-			fileDetailsValues.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-			path = new JTextField(29);
-			fileDetailsValues.add(path);
-			path.setHorizontalAlignment(SwingConstants.LEFT);
-
-			tfSearch = new JTextField();
-			tfSearch.setHorizontalAlignment(SwingConstants.LEFT);
-			fileDetailsValues.add(tfSearch);
-			tfSearch.setColumns(13);
-
-			JButton btnSearch = new JButton("Search");
-			fileDetailsValues.add(btnSearch);
 
 			int count = fileDetailsLabels.getComponentCount();
 			tableScroll.setPreferredSize(new Dimension((int) d.getWidth(), (int) d.getHeight() / 2));
@@ -145,103 +127,95 @@ public class FileExplorer {
 			Dimension preferredSize = treeScroll.getPreferredSize();
 			Dimension widePreferred = new Dimension(200, (int) preferredSize.getHeight());
 			treeScroll.setPreferredSize(widePreferred);
-
-			JToolBar toolBar = new JToolBar();
-			toolBar.setFloatable(false);
-
-			printFile = new JButton("Nén file");
-			printFile.setMnemonic('p');
-			printFile.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent ae) {
-					String name1 = null;
-
-					String s1 = path.getText();
-					String[] words = s1.split("\\\\");
-					for (String w : words) {
-						name1 = w;
-					}
-
-					try {
-						fos = new FileOutputStream(path.getText() + ".zip");
-						zipos = new ZipOutputStream(fos);
-
-						byte[] data = new byte[8];
-						fis = new FileInputStream(path.getText());
-						ze = new ZipEntry(name1);
-						zipos.putNextEntry(ze);
-						while (fis.read(data) != -1) {
-							zipos.write(data);
-						}
-						System.out.println();
-						zipos.flush();
-
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} finally {
-						if (fis != null) {
-							try {
-								fis.close();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-						if (zipos != null) {
-							try {
-								zipos.close();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-						if (fos != null) {
-							try {
-								fos.close();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			});
-			toolBar.add(printFile);
-			printFile.setEnabled(desktop.isSupported(Desktop.Action.PRINT));
 			for (int ii = 0; ii < count; ii++) {
 				fileDetailsLabels.getComponent(ii).setEnabled(false);
 			}
-
-			JPanel fileView = new JPanel(new BorderLayout(3, 3));
-
-			fileView.add(toolBar, BorderLayout.NORTH);
-
-			detailView.add(fileView, BorderLayout.SOUTH);
 			gui.setLayout(null);
 
-			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll, detailView);
-
 			JPanel panel = new JPanel();
-			treeScroll.setColumnHeaderView(panel);
-			panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+			panel.setBounds(5, 0, 659, 30);
+			gui.add(panel);
 
-			JButton btnNewButton_1 = new JButton("Back");
-			btnNewButton_1.setIcon(
+			JButton button = new JButton("Back");
+			button.setIcon(
 					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Undo_16x16_JFX.png")));
-			btnNewButton_1.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
+			button.setSelectedIcon(
+					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Undo_16x16_JFX.png")));
+			button.setHorizontalAlignment(SwingConstants.LEFT);
+			panel.add(button);
+
+			JButton button_1 = new JButton("Next");
+			button_1.setIcon(
+					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Redo_16x16_JFX.png")));
+			panel.add(button_1);
+
+			path = new JTextField(37);
+			path.setHorizontalAlignment(SwingConstants.LEFT);
+			panel.add(path);
+
+			textField = new JTextField();
+			textField.setHorizontalAlignment(SwingConstants.LEFT);
+			textField.setColumns(13);
+			panel.add(textField);
+
+			JButton button_2 = new JButton("Search");
+			panel.add(button_2);
+
+			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll, detailView);
+			splitPane.setBounds(5, 32, 659, 268);
+			gui.add(splitPane);
+
+			JButton btnNnFile = new JButton("Folder Compression");
+			btnNnFile.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					File dir = new File(path.getText());
+					String zipDirName = path.getText() + ".zip";
+					FileExplorer zipFiles = new FileExplorer();
+					zipFiles.zipDirectory(dir, zipDirName);
+					JOptionPane.showMessageDialog(null, "Successfully compressed folder");
 				}
 			});
-			btnNewButton_1.setHorizontalAlignment(SwingConstants.LEFT);
-			panel.add(btnNewButton_1);
-
-			JButton btnNewButton = new JButton("Next");
-			btnNewButton.setIcon(
-					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Redo_16x16_JFX.png")));
-			panel.add(btnNewButton);
-			splitPane.setBounds(5, 5, 659, 268);
-			gui.add(splitPane);
+			btnNnFile.setBounds(208, 302, 127, 23);
+			gui.add(btnNnFile);
 
 		}
 		return gui;
+	}
+
+	private void zipDirectory(File dir, String zipDirName) {
+		try {
+			populateFilesList(dir);
+			FileOutputStream fos = new FileOutputStream(zipDirName);
+			ZipOutputStream zos = new ZipOutputStream(fos);
+			for (String filePath : filesListInDir) {
+				System.out.println("Zipping " + filePath);
+				ZipEntry ze = new ZipEntry(filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
+				zos.putNextEntry(ze);
+				FileInputStream fis = new FileInputStream(filePath);
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = fis.read(buffer)) > 0) {
+					zos.write(buffer, 0, len);
+				}
+				zos.closeEntry();
+				fis.close();
+			}
+			zos.close();
+			fos.close();
+			System.out.println("Done");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void populateFilesList(File dir) throws IOException {
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			if (file.isFile())
+				filesListInDir.add(file.getAbsolutePath());
+			else
+				populateFilesList(file);
+		}
 	}
 
 	public void showRootFile() {
@@ -386,13 +360,14 @@ public class FileExplorer {
 				}
 
 				f.pack();
-				f.setMinimumSize(new Dimension(690, 320));
+				f.setMinimumSize(new Dimension(690, 375));
 				f.setVisible(true);
 
 				FileBrowser.showRootFile();
 			}
 		});
 	}
+
 	@SuppressWarnings("serial")
 	class FileTableModel extends AbstractTableModel {
 
