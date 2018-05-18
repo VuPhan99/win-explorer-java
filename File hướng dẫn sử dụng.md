@@ -1,5 +1,5 @@
-# Phan Xuân Vũ - 17IT2
-# Mã số đề
+# Phan Xuân Vũ - 17IT2.
+# Mã số đề: 17.
 
 1. Giới thiệu FileExplorer
   1.1. Chạy FileExplorer.java
