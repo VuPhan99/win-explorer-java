@@ -11,13 +11,13 @@
              + Click trái vào dấu (-) đứng trước một đối tượng thì trong cây thư mục sẽ được ẩn.
            - Cửa sổ bên phải: liệt kê chi tiết (gồm các thư mục con và tập tin) của đối tượng được chọn trong cửa sổ bên trái.
            - Thanh trên cùng có: nút "Back", nút "Next", một khung chỉ đường dẫn File, khung tìm kiếm và nút "Search".
-           - Thanh cuối cùng có: nút "Open", nút "Zip", nút "Copy" và nút "Past".
+           - Thanh cuối cùng có: nút "Open", nút "Zip", nút "Copy" và nút "Paste".
 2. Thao tác với thư mục, tệp tin.
 
        2.1. Mở thư mục: Khi click lên đối tượng (thư mục hoặc tệp tin) bên cửa sổ bên phải và nhấn vào nút "Open" thì đối tượng đó sẽ được mở lên và hiển thị những file có trong đối tượng ở cửa sổ bên phải.
        2.2. Di chuyển thư mục, tệp tin
-            - Click trái vào thư mục hay tệp tin cần chuyển ở cửa sổ bên phải hay trái đều được rồi nhấn nút "Copy".
-            - Click trái vào nơi muốn chuyển thư mục hay tệp tin đến và nhấn nút "Past".
+            - Click trái vào thư mục hay tệp tin cần sao chép ở cửa sổ bên phải hay trái đều được rồi nhấn nút "Copy".
+            - Click trái vào nơi muốn chuyển thư mục hay tệp tin đến và nhấn nút "Paste".
        2.3 Nén thư mục.
               Click vào thư mục cần nén và sau đó nhấn vào nút "Zip" thì thư mục sẽ được nén lại với tên giống như tên thư mục ban đầu và có đuôi là ".zip".
     
