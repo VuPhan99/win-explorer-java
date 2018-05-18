@@ -14,7 +14,7 @@
            - Thanh cuối cùng có: nút "Open", nút "Zip", nút "Copy" và nút "Past".
 2. Thao tác với thư mục, tệp tin.
 
-       2.1. Mở thư mục: Khi click lên đối tượng (thư mục hoặc tệp tin) bên cửa sổ bên phải và nhấn vào nút "Open" thì đối tượng đó sẽ            được mở lên và hiển thị những file có trong đối tượng ở cửa sổ bên phải.
+       2.1. Mở thư mục: Khi click lên đối tượng (thư mục hoặc tệp tin) bên cửa sổ bên phải và nhấn vào nút "Open" thì đối tượng đó sẽ được mở lên và hiển thị những file có trong đối tượng ở cửa sổ bên phải.
        2.2. Di chuyển thư mục, tệp tin
             - Click trái vào thư mục hay tệp tin cần chuyển ở cửa sổ bên phải hay trái đều được rồi nhấn nút "Copy".
             - Click trái vào nơi muốn chuyển thư mục hay tệp tin đến và nhấn nút "Past".
