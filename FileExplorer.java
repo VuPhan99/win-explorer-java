@@ -43,6 +43,10 @@ public class FileExplorer {
 	private JRadioButton newTypeFile;
 	@SuppressWarnings("unused")
 	private JTextField name;
+	private File dirFrom;
+	private File dirTo;
+
+	private String nameFile;
 	FileOutputStream fos;
 	ZipOutputStream zipos;
 	FileInputStream fis;
@@ -53,42 +57,6 @@ public class FileExplorer {
 	private JTextField path;
 	private JTextField textField;
 	List<String> filesListInDir = new ArrayList<String>();
-
-	private void zipDirectory(File dir, String zipDirName) {
-		try {
-			populateFilesList(dir);
-			FileOutputStream fos = new FileOutputStream(zipDirName);
-			ZipOutputStream zos = new ZipOutputStream(fos);
-			for (String filePath : filesListInDir) {
-				System.out.println("Zipping " + filePath);
-				ZipEntry ze = new ZipEntry(filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
-				zos.putNextEntry(ze);
-				FileInputStream fis = new FileInputStream(filePath);
-				byte[] buffer = new byte[1024];
-				int len;
-				while ((len = fis.read(buffer)) > 0) {
-					zos.write(buffer, 0, len);
-				}
-				zos.closeEntry();
-				fis.close();
-			}
-			zos.close();
-			fos.close();
-			System.out.println("Done");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void populateFilesList(File dir) throws IOException {
-		File[] files = dir.listFiles();
-		for (File file : files) {
-			if (file.isFile())
-				filesListInDir.add(file.getAbsolutePath());
-			else
-				populateFilesList(file);
-		}
-	}
 
 	public Container getGui() {
 
@@ -173,6 +141,25 @@ public class FileExplorer {
 			gui.add(panel);
 
 			JButton button = new JButton("Back");
+			button.addMouseListener(new MouseAdapter() {
+				private File back;
+				private File previousPath;
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if (e.getClickCount() == 1) {
+						back = new File(path.getText());
+						if (back.getParent() == null) {
+							back = new File(path.getText());
+						} else {
+							previousPath = new File(back.getParent());
+							DefaultMutableTreeNode node = new DefaultMutableTreeNode(previousPath);
+							showChildren(node);
+							path.setText(back.getParent());
+						}
+					}
+				}
+			});
 			button.setIcon(
 					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Undo_16x16_JFX.png")));
 			button.setSelectedIcon(
@@ -181,6 +168,18 @@ public class FileExplorer {
 			panel.add(button);
 
 			JButton button_1 = new JButton("Next");
+			button_1.addActionListener(new ActionListener() {
+				private File next;
+
+				public void actionPerformed(ActionEvent e) {
+					String name = path.getText();
+					next = new File(name);
+					if (next.isDirectory()) {
+						DefaultMutableTreeNode node = new DefaultMutableTreeNode(next);
+						showChildren(node);
+					}
+				}
+			});
 			button_1.setIcon(
 					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Redo_16x16_JFX.png")));
 			panel.add(button_1);
@@ -201,7 +200,7 @@ public class FileExplorer {
 			splitPane.setBounds(5, 32, 659, 268);
 			gui.add(splitPane);
 
-			JButton btnNnFile = new JButton("Folder Compression");
+			JButton btnNnFile = new JButton("Zip");
 			btnNnFile.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
 					File dir = new File(path.getText());
@@ -211,11 +210,189 @@ public class FileExplorer {
 					JOptionPane.showMessageDialog(null, "Successfully compressed folder");
 				}
 			});
-			btnNnFile.setBounds(208, 302, 127, 23);
+			btnNnFile.setBounds(322, 302, 81, 23);
 			gui.add(btnNnFile);
+
+			JButton btnNewButton = new JButton("Open");
+			btnNewButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					File open = new File(path.getText());
+					try {
+						if (open.isFile()) {
+							openFile(open);
+						} else if (open.isDirectory()) {
+							DefaultMutableTreeNode node = new DefaultMutableTreeNode(open);
+							showChildren(node);
+						}
+
+					} catch (Exception e2) {
+						// TODO: handle exception
+					}
+				}
+			});
+			btnNewButton.setBounds(212, 302, 89, 23);
+			gui.add(btnNewButton);
+
+			JButton btnCopy = new JButton("Copy");
+			btnCopy.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+					dirFrom = new File(path.getText());
+					String name = path.getText();
+					String[] words = name.split("\\\\");
+					for (String w : words) {
+						nameFile = w;
+					}
+				}
+			});
+			btnCopy.setBounds(426, 302, 89, 23);
+			gui.add(btnCopy);
+
+			JButton btnPast = new JButton("Past");
+			btnPast.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+					if (dirFrom.isDirectory()) {
+						dirTo = new File(path.getText() + "\\" + nameFile);
+						FileExplorer.copyFolder(dirFrom, dirTo);
+					} else if (dirFrom.isFile()) {
+						dirTo = new File(path.getText() + "\\" + nameFile);
+						// System.out.println(dirTo);
+						try {
+							copyFile(dirFrom, dirTo);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+			btnPast.setBounds(525, 302, 89, 23);
+			gui.add(btnPast);
 
 		}
 		return gui;
+	}
+
+	private void zipDirectory(File dir, String zipDirName) {
+		try {
+			populateFilesList(dir);
+			FileOutputStream fos = new FileOutputStream(zipDirName);
+			ZipOutputStream zos = new ZipOutputStream(fos);
+			for (String filePath : filesListInDir) {
+				System.out.println("Zipping " + filePath);
+				ZipEntry ze = new ZipEntry(filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
+				zos.putNextEntry(ze);
+				FileInputStream fis = new FileInputStream(filePath);
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = fis.read(buffer)) > 0) {
+					zos.write(buffer, 0, len);
+				}
+				zos.closeEntry();
+				fis.close();
+			}
+			zos.close();
+			fos.close();
+			System.out.println("Done");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void populateFilesList(File dir) throws IOException {
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			if (file.isFile())
+				filesListInDir.add(file.getAbsolutePath());
+			else
+				populateFilesList(file);
+		}
+	}
+
+	public static void copyFile(File oldLocation, File newLocation) throws IOException {
+		if (oldLocation.exists()) {
+			BufferedInputStream reader = new BufferedInputStream(new FileInputStream(oldLocation));
+			BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(newLocation, false));
+			try {
+				byte[] buff = new byte[8192];
+				int numChars;
+				while ((numChars = reader.read(buff, 0, buff.length)) != -1) {
+					writer.write(buff, 0, numChars);
+				}
+			} catch (IOException ex) {
+				throw new IOException(
+						"IOException when transferring " + oldLocation.getPath() + " to " + newLocation.getPath());
+			} finally {
+				try {
+					if (reader != null) {
+						writer.close();
+						reader.close();
+					}
+				} catch (IOException ex) {
+					// Log.e(TAG, "Error closing files when transferring " + oldLocation.getPath() +
+					// " to " + newLocation.getPath() );
+				}
+			}
+		} else {
+			throw new IOException("Old location does not exist when transferring " + oldLocation.getPath() + " to "
+					+ newLocation.getPath());
+		}
+	}
+
+	public static void copyFolder(File source, File destination) {
+		if (source.isDirectory()) {
+			if (!destination.exists()) {
+				destination.mkdirs();
+			}
+
+			String files[] = source.list();
+
+			for (String file : files) {
+				File srcFile = new File(source, file);
+				File destFile = new File(destination, file);
+
+				copyFolder(srcFile, destFile);
+			}
+		} else {
+			InputStream in = null;
+			OutputStream out = null;
+
+			try {
+				in = new FileInputStream(source);
+				out = new FileOutputStream(destination);
+
+				byte[] buffer = new byte[1024];
+
+				int length;
+				while ((length = in.read(buffer)) > 0) {
+					out.write(buffer, 0, length);
+				}
+			} catch (Exception e) {
+				try {
+					in.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+
+				try {
+					out.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static void openFile(File path) throws IOException {
+		if (!Desktop.isDesktopSupported()) {
+			System.out.println("Desktop is not supported");
+			return;
+		}
+
+		Desktop desktop = Desktop.getDesktop();
+		if (path.exists())
+			desktop.open(path);
 	}
 
 	public void showRootFile() {
