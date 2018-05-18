@@ -3,9 +3,9 @@
 
 1. Giới thiệu FileExplorer.
 
-  1.1. Chạy FileExplorer.java.
+       1.1. Chạy FileExplorer.java.
   
-  1.2. Cửa sổ của File Explorer
+       1.2. Cửa sổ của File Explorer
     - Cửa sổ bên trái: là cây thư mục liệt kê tất cả các tài nguyên của máy: các ổ đĩa, thư mục, tập tin,…
       + Click trái lên đối tượng (ổ đĩa, thư mục,…) thì nội dung bên trong của đối tượng sẽ hiện lên ở khung bên phải.
       + Click trái vào dấu (+) đứng trước một đối tượng thì trong cây thư mục sẽ hiện tiếp các thư mục con của đối tượng này.
