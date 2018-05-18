@@ -58,6 +58,8 @@ public class FileExplorer {
 	private JTextField textField;
 	List<String> filesListInDir = new ArrayList<String>();
 
+	
+
 	public Container getGui() {
 
 		if (gui == null) {
@@ -70,6 +72,33 @@ public class FileExplorer {
 			JPanel detailView = new JPanel(new BorderLayout(3, 3));
 
 			table = new JTable();
+			table.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					if(arg0.getClickCount() == 2) {
+						File folder = new File(path.getText());
+						if(folder.isDirectory()) {
+							DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder);
+							showChildren(node);
+						}
+						else if(folder.isFile()) {
+							if(!Desktop.isDesktopSupported()){
+//					            System.out.println("Desktop is not supported");
+					            return;
+					        }
+					        
+					        Desktop desktop = Desktop.getDesktop();
+					        if(folder.exists())
+								try {
+									desktop.open(folder);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						}
+					}
+				}
+			});
 			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table.setAutoCreateRowSorter(true);
 			table.setShowVerticalLines(false);
@@ -147,18 +176,19 @@ public class FileExplorer {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if (e.getClickCount() == 1) {
-						back = new File(path.getText());
-						if (back.getParent() == null) {
-							back = new File(path.getText());
-						} else {
-							previousPath = new File(back.getParent());
-							DefaultMutableTreeNode node = new DefaultMutableTreeNode(previousPath);
-							showChildren(node);
-							path.setText(back.getParent());
+						if(e.getClickCount()==1) {
+							back = new File(path.getText());							
+							if(back.getParent() == null) {	
+								back = new File(path.getText());
+							}
+							else {
+								previousPath = new File(back.getParent());
+								DefaultMutableTreeNode node = new DefaultMutableTreeNode(previousPath) ;
+								showChildren(node);
+								path.setText(back.getParent());
+							}
 						}
 					}
-				}
 			});
 			button.setIcon(
 					new ImageIcon(FileExplorer.class.getResource("/com/sun/javafx/scene/web/skin/Undo_16x16_JFX.png")));
@@ -174,9 +204,9 @@ public class FileExplorer {
 				public void actionPerformed(ActionEvent e) {
 					String name = path.getText();
 					next = new File(name);
-					if (next.isDirectory()) {
+					if(next.isDirectory()) {
 						DefaultMutableTreeNode node = new DefaultMutableTreeNode(next);
-						showChildren(node);
+						showChildren(node);	
 					}
 				}
 			});
@@ -212,19 +242,20 @@ public class FileExplorer {
 			});
 			btnNnFile.setBounds(322, 302, 81, 23);
 			gui.add(btnNnFile);
-
+			
 			JButton btnNewButton = new JButton("Open");
 			btnNewButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					File open = new File(path.getText());
 					try {
-						if (open.isFile()) {
+						if(open.isFile()) {
 							openFile(open);
-						} else if (open.isDirectory()) {
+						}
+						else if(open.isDirectory()) {
 							DefaultMutableTreeNode node = new DefaultMutableTreeNode(open);
 							showChildren(node);
 						}
-
+						
 					} catch (Exception e2) {
 						// TODO: handle exception
 					}
@@ -232,9 +263,10 @@ public class FileExplorer {
 			});
 			btnNewButton.setBounds(212, 302, 89, 23);
 			gui.add(btnNewButton);
-
+			
 			JButton btnCopy = new JButton("Copy");
 			btnCopy.addActionListener(new ActionListener() {
+				
 
 				public void actionPerformed(ActionEvent e) {
 					dirFrom = new File(path.getText());
@@ -247,17 +279,18 @@ public class FileExplorer {
 			});
 			btnCopy.setBounds(426, 302, 89, 23);
 			gui.add(btnCopy);
-
+			
 			JButton btnPast = new JButton("Past");
 			btnPast.addActionListener(new ActionListener() {
-
+				
 				public void actionPerformed(ActionEvent e) {
-					if (dirFrom.isDirectory()) {
-						dirTo = new File(path.getText() + "\\" + nameFile);
+					if(dirFrom.isDirectory()) {
+						dirTo = new File(path.getText()+ "\\" + nameFile);
 						FileExplorer.copyFolder(dirFrom, dirTo);
-					} else if (dirFrom.isFile()) {
-						dirTo = new File(path.getText() + "\\" + nameFile);
-						// System.out.println(dirTo);
+					}
+					else if(dirFrom.isFile()){
+						dirTo = new File(path.getText()+ "\\" + nameFile);
+//						System.out.println(dirTo);
 						try {
 							copyFile(dirFrom, dirTo);
 						} catch (IOException e1) {
@@ -273,7 +306,6 @@ public class FileExplorer {
 		}
 		return gui;
 	}
-
 	private void zipDirectory(File dir, String zipDirName) {
 		try {
 			populateFilesList(dir);
@@ -309,92 +341,100 @@ public class FileExplorer {
 				populateFilesList(file);
 		}
 	}
-
 	public static void copyFile(File oldLocation, File newLocation) throws IOException {
-		if (oldLocation.exists()) {
-			BufferedInputStream reader = new BufferedInputStream(new FileInputStream(oldLocation));
-			BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(newLocation, false));
-			try {
-				byte[] buff = new byte[8192];
-				int numChars;
-				while ((numChars = reader.read(buff, 0, buff.length)) != -1) {
-					writer.write(buff, 0, numChars);
-				}
-			} catch (IOException ex) {
-				throw new IOException(
-						"IOException when transferring " + oldLocation.getPath() + " to " + newLocation.getPath());
-			} finally {
-				try {
-					if (reader != null) {
-						writer.close();
-						reader.close();
-					}
-				} catch (IOException ex) {
-					// Log.e(TAG, "Error closing files when transferring " + oldLocation.getPath() +
-					// " to " + newLocation.getPath() );
-				}
-			}
-		} else {
-			throw new IOException("Old location does not exist when transferring " + oldLocation.getPath() + " to "
-					+ newLocation.getPath());
-		}
-	}
+        if ( oldLocation.exists( )) {
+            BufferedInputStream  reader = new BufferedInputStream( new FileInputStream(oldLocation) );
+            BufferedOutputStream  writer = new BufferedOutputStream( new FileOutputStream(newLocation, false));
+            try {
+                byte[]  buff = new byte[8192];
+                int numChars;
+                while ( (numChars = reader.read(  buff, 0, buff.length ) ) != -1) {
+                    writer.write( buff, 0, numChars );
+                }
+            } catch( IOException ex ) {
+                throw new IOException("IOException when transferring " + oldLocation.getPath() + " to " + newLocation.getPath());
+            } finally {
+                try {
+                    if ( reader != null ){                      
+                        writer.close();
+                        reader.close();
+                    }
+                } catch( IOException ex ){
+//                    Log.e(TAG, "Error closing files when transferring " + oldLocation.getPath() + " to " + newLocation.getPath() ); 
+                }
+            }
+        } else {
+            throw new IOException("Old location does not exist when transferring " + oldLocation.getPath() + " to " + newLocation.getPath() );
+        }
+    }
+	public static void copyFolder(File source, File destination)
+    {
+        if (source.isDirectory())
+        {
+            if (!destination.exists())
+            {
+                destination.mkdirs();
+            }
 
-	public static void copyFolder(File source, File destination) {
-		if (source.isDirectory()) {
-			if (!destination.exists()) {
-				destination.mkdirs();
-			}
+            String files[] = source.list();
 
-			String files[] = source.list();
+            for (String file : files)
+            {
+                File srcFile = new File(source, file);
+                File destFile = new File(destination, file);
 
-			for (String file : files) {
-				File srcFile = new File(source, file);
-				File destFile = new File(destination, file);
+                copyFolder(srcFile, destFile);
+            }
+        }
+        else
+        {
+            InputStream in = null;
+            OutputStream out = null;
 
-				copyFolder(srcFile, destFile);
-			}
-		} else {
-			InputStream in = null;
-			OutputStream out = null;
+            try
+            {
+                in = new FileInputStream(source);
+                out = new FileOutputStream(destination);
 
-			try {
-				in = new FileInputStream(source);
-				out = new FileOutputStream(destination);
+                byte[] buffer = new byte[1024];
 
-				byte[] buffer = new byte[1024];
+                int length;
+                while ((length = in.read(buffer)) > 0)
+                {
+                    out.write(buffer, 0, length);
+                }
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e1)
+                {
+                    e1.printStackTrace();
+                }
 
-				int length;
-				while ((length = in.read(buffer)) > 0) {
-					out.write(buffer, 0, length);
-				}
-			} catch (Exception e) {
-				try {
-					in.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-
-				try {
-					out.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
-
+                try
+                {
+                    out.close();
+                }
+                catch (IOException e1)
+                {
+                    e1.printStackTrace();
+                }
+            }
+        }
+    }
 	public static void openFile(File path) throws IOException {
-		if (!Desktop.isDesktopSupported()) {
-			System.out.println("Desktop is not supported");
-			return;
-		}
-
-		Desktop desktop = Desktop.getDesktop();
-		if (path.exists())
-			desktop.open(path);
+		if(!Desktop.isDesktopSupported()){
+            System.out.println("Desktop is not supported");
+            return;
+        }
+        
+        Desktop desktop = Desktop.getDesktop();
+        if(path.exists()) desktop.open(path);
 	}
-
 	public void showRootFile() {
 		tree.setSelectionInterval(0, 0);
 	}
@@ -642,7 +682,6 @@ public class FileExplorer {
 				label.setBackground(backgroundNonSelectionColor);
 				label.setForeground(textNonSelectionColor);
 			}
-
 			return label;
 		}
 	}
