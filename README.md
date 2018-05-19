@@ -1,6 +1,7 @@
 # Phan Xuân Vũ - 17IT2.
 # Mã số đề: 17.
 A. Video hướng dẫn sử dụng.
+       https://www.youtube.com/watch?v=ISyhY4DeMZM
 
 B.Hướng dẫn sử dụng.
 1. Giới thiệu FileExplorer.
