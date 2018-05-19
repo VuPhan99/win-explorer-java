@@ -1,6 +1,8 @@
 # Phan Xuân Vũ - 17IT2.
 # Mã số đề: 17.
+A. Video hướng dẫn sử dụng.
 
+B.Hướng dẫn sử dụng.
 1. Giới thiệu FileExplorer.
 
        1.1. Chạy FileExplorer.java.
