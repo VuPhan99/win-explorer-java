@@ -29,7 +29,7 @@ B.Hướng dẫn sử dụng.
 
                      B3.Dùng lệnh cd chuyển đến thư mục chứa source code
                             Ví dụ:
-                            cd D:\JavaStudy\JAVA\Thigiuaky\src>
+                            cd D:\JavaStudy\JAVA\Thigiuaky\src
                      B4.Biên dịch bằng lệnh javac
                             javac FileExplorer.java
                      B5.Chạy bằng lệnh java
