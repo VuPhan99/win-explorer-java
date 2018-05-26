@@ -28,15 +28,12 @@ B.Hướng dẫn sử dụng.
                      B2.Mở cmd
 
                      B3.Dùng lệnh cd chuyển đến thư mục chứa source code
-
-                      Ví dụ:
-                      cd D:\JavaStudy\JAVA\Thigiuaky\src>
+                            Ví dụ:
+                            cd D:\JavaStudy\JAVA\Thigiuaky\src>
                      B4.Biên dịch bằng lệnh javac
-
-                      javac FileExplorer.java
+                            javac FileExplorer.java
                      B5.Chạy bằng lệnh java
-
-                      java FileExplorer
+                            java FileExplorer
        
        2. Cách sử dụng
               Mở thư mục: Khi click lên đối tượng (thư mục hoặc tệp tin) bên cửa sổ bên phải và nhấn vào nút "Open" thì đối tượng đó sẽ                           được mở lên và hiển thị những file có trong đối tượng ở cửa sổ bên phải.
