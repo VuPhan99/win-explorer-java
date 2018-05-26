@@ -1,5 +1,10 @@
 # Phan Xuân Vũ - 17IT2.
 # Mã số đề: 17.
+       Câu 1 : Thiết kế giao diện File Explorer
+
+       Câu 2 : Chức năng nén thư mục
+
+               Chức năng phụ : Mở File, Copy, Past File
 A. Video hướng dẫn sử dụng.
        https://www.youtube.com/watch?v=ISyhY4DeMZM
 
